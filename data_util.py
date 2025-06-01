@@ -10,6 +10,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import AssetClass
 import requests
 from bs4 import BeautifulSoup
+from config import ALPACA_API_KEY, ALPACA_API_SECRET
 
 
 
