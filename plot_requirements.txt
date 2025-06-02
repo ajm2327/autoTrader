@@ -1,0 +1,16 @@
+# Plotting and visualization dependencies for test_data_util.py
+
+# Core plotting library
+matplotlib>=3.5.0
+
+# Enhanced plotting and styling
+seaborn>=0.11.0
+
+# Data manipulation (should already be installed)
+pandas>=1.3.0
+numpy>=1.21.0
+
+# Optional: for better date formatting and handling
+python-dateutil>=2.8.0
+
+# Install with: pip install -r plot_requirements.txt

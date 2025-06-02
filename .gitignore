@@ -1,6 +1,6 @@
 # Virtual environment
 trading-env/
-
+test_plots/
 # Python cache files
 __pycache__/
 *.py[cod]
