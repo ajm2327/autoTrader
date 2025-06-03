@@ -1,3 +1,5 @@
+from clients import llm, get_llm_with_tools, get_tool_node
+
 # Review Agent's historical data retrieval tool
 @tool
 def get_historical_data_for_review(ticker: str, trade_date: str) -> str:
@@ -192,11 +194,11 @@ def gemini_review_node(state: ReviewState) -> ReviewState:
 
     return state | {"messages": [new_output]}
 
-review_tool_node = ToolNode(review_tools)
+review_tool_node = get_tool_node(review_tools)
 
 # Initialize the Review Agent
 review_llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")#ChatGoogleGenerativeAI(model="gemini-2.5-pro", google_api_key=os.environ["GOOGLE_API_KEY"])#
-review_llm_with_tools = review_llm.bind_tools(review_tools)
+review_llm_with_tools = get_llm_with_tools(review_tools)
 
 review_graph = StateGraph(ReviewState)
 review_graph.add_node("review_tools", review_tool_node)

@@ -1,4 +1,4 @@
-from alpaca.data.historical import StockHistoricalDataClient
+from alpaca_clients import data_client
 from alpaca.data.requests import StockBarsRequest, StockLatestQuoteRequest
 from alpaca.trading.requests import GetAssetsRequest
 from alpaca.data.timeframe import TimeFrame
@@ -6,7 +6,6 @@ from langchain_core.tools import tool
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import AssetClass
 import requests
 from bs4 import BeautifulSoup
@@ -196,10 +195,6 @@ def get_alpaca_data(ticker, start_date, end_date, is_paper=True, timescale = "Da
     """
     Retrieve historical stock data from Alpaca API with debugging.
     """
-    api_key = ALPACA_API_KEY
-    api_secret = ALPACA_API_SECRET
-    if not api_key or not api_secret:
-        raise ValueError("Alpaca API key and secret required")
 
     try:
         # Convert date strings to datetime
@@ -213,7 +208,6 @@ def get_alpaca_data(ticker, start_date, end_date, is_paper=True, timescale = "Da
 
         print(f"GETTING DATA FROM {start} to {end}")
         # Initialize Alpaca data client
-        alpaca_client = StockHistoricalDataClient(api_key, api_secret)
         match timescale:
             case "Minute":
                 unit = TimeFrame.Minute
@@ -233,7 +227,7 @@ def get_alpaca_data(ticker, start_date, end_date, is_paper=True, timescale = "Da
         )
 
         print(f"Fetching daily data for {ticker}")
-        bars = alpaca_client.get_stock_bars(request_params)
+        bars = data_client.get_stock_bars(request_params)
 
         if not hasattr(bars, 'df') or bars.df.empty:
             print("Retrieved empty DataFrame")

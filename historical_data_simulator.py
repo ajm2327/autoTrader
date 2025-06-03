@@ -1,32 +1,37 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import time
-from langchain_core.messages import HumanMessage
 import traceback
 import json
 import os
-from IPython.display import display, clear_output
-
-import pandas as pd
-from datetime import datetime, timedelta
-from typing_extensions import TypedDict
-import time
-from langchain_core.messages import HumanMessage
-from langgraph.graph import StateGraph
 
 from typing import Annotated, Literal
 from typing_extensions import TypedDict
-from langgraph.graph.message import add_messages
 
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import ToolNode
 
-from langchain_core.messages import HumanMessage
+from data_util import get_alpaca_data, add_indicators
+from alpaca_clients import llm, get_llm_with_tools, get_tool_node
 
-from langchain_core.messages import SystemMessage, AIMessage
 
-from langgraph.graph import StateGraph, START, END
+from decision_utils import (
+    DecisionState,          
+    maybe_route_to_tools,  
+    gemini_decision_node,    
+    mock_trade_manager,      
+    setup_custom_mock_news,
+    mock_check_news, mock_place_market_BUY, mock_place_market_SELL, mock_get_position             
+)
 
+from decision_tools import (
+    get_account, place_market_BUY, place_market_SELL, get_stock_price,
+    get_rvol, get_price_change, get_current_quote, get_company_overview,
+    get_float_info, get_detailed_stock_data, real_check_news
+)
 class HistoricalDataSimulator:
     """
     Enhanced historical data simulator with price change tracking and persistent logging
@@ -946,16 +951,16 @@ def run_historical_simulation(ticker="AMD", start_date="2025-03-01", end_date="2
 
 
 
-setup_custom_mock_news()
-mock_tools = [mock_check_news, mock_place_market_BUY, mock_place_market_SELL, mock_get_position]
- 
-# Create LLM and bind tools
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-llm_with_tools = llm.bind_tools(mock_tools)
-tool_node = ToolNode(mock_tools)
-
-final_state = run_historical_simulation(
-    ticker="AMD",
-    start_date="2025-03-01",
-    end_date="2025-04-17"
-)
+if __name__ == "__main__":
+    setup_custom_mock_news()
+    mock_tools = [mock_check_news, mock_place_market_BUY, mock_place_market_SELL, mock_get_position]
+     
+    # Create LLM and bind tools
+    # Use centralized LLM creation
+    llm_with_tools = get_llm_with_tools(mock_tools)
+    tool_node = get_tool_node(mock_tools)
+    final_state = run_historical_simulation(
+        ticker="AMD",
+        start_date="2025-03-01",
+        end_date="2025-04-17"
+    )

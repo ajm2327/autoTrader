@@ -6,10 +6,12 @@ from langchain_core.tools import tool
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from alpaca.trading.client import TradingClient
+from alpaca_clients import trading_client, data_client
 from alpaca.trading.enums import AssetClass
 import requests
 from bs4 import BeautifulSoup
+
+from data_util import get_alpaca_data, add_indicators, dataframe_info
 
 #==================== G E M I N I +++++++ T O O L S E T ======================================#
 
@@ -70,7 +72,7 @@ def get_stock_price(symbol: str) -> str:
     
     try:
         request_param = StockLatestQuoteRequest(symbol_or_symbols=symbol)
-        quote = alpaca_client.get_stock_latest_quote(request_param)
+        quote = data_client.get_stock_latest_quote(request_param)
         return f"{symbol} ask price: {quote[symbol_str].ask_price}, bid price: {quote[symbol_str].bid_price}"
     except Exception as e:
         return f"Price fetch failed: {str(e)}"
@@ -117,7 +119,7 @@ def get_current_quote(ticker: str) -> str:
     """Get current quote for a ticker (price and volume)."""
     try:
         req = StockLatestQuoteRequest(symbol_or_symbols=[ticker])
-        quote = alpaca_client.get_stock_latest_quote(req)
+        quote = data_client.get_stock_latest_quote(req)
         ask_price = quote[ticker].ask_price
         bid_price = quote[ticker].bid_price
         return f"{ticker} current price is ${ask_price:.2f} (Ask), ${bid_price:.2f} (Bid)"

@@ -10,6 +10,19 @@ from langchain_core.tools import tool
 from langchain.agents import tool
 import traceback
 
+from typing import Annotated, Literal
+from typing_extensions import TypedDict
+from langgraph.graph.message import add_messages
+from langchain_core.messages import SystemMessage, AIMessage
+from langgraph.graph import StateGraph, START, END
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.prebuilt import ToolNode
+
+from alpaca_clients import llm, get_llm_with_tools, get_tool_node
+
+
+
+
 
 GEMINI_TRADER_SYSINT = (
     "system",
@@ -458,6 +471,10 @@ def setup_custom_mock_news():
     })
     
     print("Custom mock news set up successfully")
+
+mock_tools = [mock_check_news, mock_place_market_BUY, mock_place_market_SELL, mock_get_position]
+llm_with_tools = get_llm_with_tools(mock_tools)
+tool_node = get_tool_node(mock_tools)
 
 # Initialize the mock trade manager
 mock_trade_manager = MockTradeManager()
